@@ -109,4 +109,24 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeMapper.update(employee);
     }
 
+
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        employee.setPassword("****");
+        return employee;
+    }
+
+
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        //通过调用beanUtils 方法直接复制属性值 属性名一致
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        employee.setUpdateTime(LocalDateTime.now());
+        // 设置修改人id，jwt的时候就把当前用户id放在了线程变量里面 这里直接获得当前用户id
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.update(employee);
+    }
+
 }
