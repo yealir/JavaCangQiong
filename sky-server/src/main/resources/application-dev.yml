@@ -11,3 +11,9 @@ sky:
     access-key-id: LTAI5t6Jve6iQshKYT2EUoAF
     access-key-secret: yHIUiythuPtHj5LMbF0F9ymgNFeJPi
     bucket-name: java-sky-qhj
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    database: 0
