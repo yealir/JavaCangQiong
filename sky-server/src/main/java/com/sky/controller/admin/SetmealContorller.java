@@ -71,4 +71,14 @@ public class SetmealContorller {
 
         return Result.success();
     }
+
+
+    @PostMapping("/status/{status}")
+    public Result updateStatus(@PathVariable Integer status ,Long id){
+        log.info("修改套餐状态id为：{}",id);
+
+        setmealService.updateStatus(status,id);
+
+        return Result.success();
+    }
 }

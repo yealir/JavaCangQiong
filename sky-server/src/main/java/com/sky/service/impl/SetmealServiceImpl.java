@@ -6,10 +6,12 @@ import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.exception.SetmealEnableFailedException;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
@@ -35,6 +37,8 @@ public class SetmealServiceImpl implements SetmealService {
     SetmealMapper setmealMapper;
     @Autowired
     SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private DishMapper dishMapper;
 
     @Transactional
     public void saveWithDish(SetmealDTO setmealDTO) {
@@ -138,6 +142,28 @@ public class SetmealServiceImpl implements SetmealService {
             setmealDish.setSetmealId(setmealId);
         }
         setmealDishMapper.insertSetmealDish(setmealDishes);
+
+    }
+
+    /**
+     * 修改套餐状态
+     * @param status
+     * @param id
+     */
+    public void updateStatus(Integer status, Long id) {
+        //修改，只有在套餐选定的这些菜品都是在售状态才能让整个套餐都在售
+        // 首先根据
+        if(status == StatusConstant.ENABLE){
+            List<Dish> dishList = dishMapper.getDishListBySetmealId(id);
+            if(dishList != null && dishList.size() > 0)
+                for(Dish dish : dishList){
+                    if(dish.getStatus() == StatusConstant.DISABLE)
+                        throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                }
+        }
+        Setmeal setmeal = Setmeal.builder()
+                        .id(id).status(status).build();
+        setmealMapper.update(setmeal);
 
     }
 }
