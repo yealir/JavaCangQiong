@@ -71,9 +71,9 @@ public class DishController {
     }
 
     @GetMapping("/list")
-    public Result<List<Dish>> list(Long categoryId){
-        log.info("根据分类查询菜品：{}", categoryId);
-        List<Dish> dishList = dishService.list(categoryId);
+    public Result<List<Dish>> list(Long categoryId,String name){
+        log.info("根据分类查询菜品：{},{}", categoryId,name);
+        List<Dish> dishList = dishService.list(categoryId,name);
         return Result.success(dishList);
     }
 }
