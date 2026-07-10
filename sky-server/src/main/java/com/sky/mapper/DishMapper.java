@@ -48,4 +48,6 @@ public interface DishMapper {
     //更新菜品
     @AutoFill(value = OperationType.UPDATE)
     void update(Dish dish);
+
+    List<Dish> list(Dish dish);
 }
