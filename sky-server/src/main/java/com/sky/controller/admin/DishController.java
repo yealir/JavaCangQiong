@@ -11,9 +11,12 @@ import com.sky.vo.DishVO;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 菜品管理
@@ -26,12 +29,16 @@ public class DishController {
 
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 新增菜品
      */
     @PostMapping
     public Result saveDish(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品：{}", dishDTO);
+        String key = "dish_" + dishDTO.getCategoryId();
+        setRedis(key);
         dishService.saveDishWithFlavor(dishDTO);
         return Result.success();
     }
@@ -43,9 +50,19 @@ public class DishController {
         return Result.success(pageResult);
     }
 
+    @PostMapping("/status/{status}")
+    public Result doOrOff(@PathVariable Integer status , Long id){
+        log.info("当前菜品要修改为的状态为：{},{}",status , id);
+        String key = "dish_*";
+        setRedis(key);
+        dishService.doOrOff(status,id);
+        return Result.success();
+    }
     @DeleteMapping
     public Result deleteDish(@RequestParam List<Long> ids){//@RequestParam 通过框架自动将1,1,...1转换为List集合元素
         log.info("删除菜品：{}", ids);
+        String key = "dish_*";
+        setRedis(key);
         dishService.deleteDish(ids);
         return Result.success();
     }
@@ -66,6 +83,8 @@ public class DishController {
     @PutMapping
     public Result updateDish(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品：{}", dishDTO);
+        String key = "dish_*";
+        setRedis(key);
         dishService.updateDishWithFlavor(dishDTO);
         return Result.success();
     }
@@ -76,4 +95,10 @@ public class DishController {
         List<Dish> dishList = dishService.list(categoryId,name);
         return Result.success(dishList);
     }
+
+    private void setRedis(String key){
+        Set keys = redisTemplate.keys(key);
+        redisTemplate.delete(keys);
+    }
+
 }

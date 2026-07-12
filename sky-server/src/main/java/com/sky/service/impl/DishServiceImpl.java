@@ -37,6 +37,9 @@ public class DishServiceImpl implements DishService {
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
     private SetmealMapper setmealMapper;
+    @Autowired
+    private DishService dishService;
+
     @Transactional
     public void saveDishWithFlavor(DishDTO dishDTO) {
         //向菜品插入一条数据 属性命名一致
@@ -152,5 +155,10 @@ public class DishServiceImpl implements DishService {
         }
 
         return dishVOList;
+    }
+
+
+    public void doOrOff(Integer status,Long dishId) {
+        dishMapper.doOrOff(status,dishId);
     }
 }
